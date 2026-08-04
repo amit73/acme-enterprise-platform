@@ -17,12 +17,37 @@ data "aws_vpc" "default" {
   default = true
 }
 
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+data "aws_ami" "ubuntu" {
+
+  most_recent = true
+
+  owners = ["099720109477"]
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+}
+
 resource "aws_security_group" "web_sg" {
   name        = "web-sg"
   description = "Security group for Acme web server"
 
   vpc_id = data.aws_vpc.default.id
-  
+
   ingress {
     description = "SSH"
     from_port   = 22
@@ -50,4 +75,24 @@ resource "aws_security_group" "web_sg" {
     Name = "Acme-Web-SG"
   }
 
+}
+
+resource "aws_instance" "web_server" {
+
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+
+  subnet_id = data.aws_subnets.default.ids[0]
+
+  vpc_security_group_ids = [
+    aws_security_group.web_sg.id
+  ]
+
+  key_name = var.key_pair_name
+
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "Acme-Web-Server"
+  }
 }
