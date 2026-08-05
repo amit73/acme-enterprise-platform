@@ -21,3 +21,7 @@ EOF
 
 systemctl enable nginx
 systemctl start nginx
+
+apt update
+
+apt install -y nginx awscli
