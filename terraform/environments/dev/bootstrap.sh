@@ -4,7 +4,7 @@ set -e
 
 apt update
 
-apt install -y nginx
+apt install -y nginx awscli
 
 cat <<EOF >/var/www/html/index.html
 <!DOCTYPE html>
@@ -21,7 +21,3 @@ EOF
 
 systemctl enable nginx
 systemctl start nginx
-
-apt update
-
-apt install -y nginx awscli
