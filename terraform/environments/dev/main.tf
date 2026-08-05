@@ -13,6 +13,8 @@ provider "aws" {
   region  = "us-east-1"
 }
 
+
+
 data "aws_vpc" "default" {
   default = true
 }
@@ -41,6 +43,7 @@ data "aws_ami" "ubuntu" {
   }
 
 }
+
 
 resource "aws_security_group" "web_sg" {
   name        = "web-sg"
@@ -82,6 +85,8 @@ resource "aws_instance" "web_server" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.micro"
 
+  iam_instance_profile = aws_iam_instance_profile.web_profile.name
+
   subnet_id = data.aws_subnets.default.ids[0]
 
   vpc_security_group_ids = [
@@ -92,6 +97,8 @@ resource "aws_instance" "web_server" {
 
   associate_public_ip_address = true
 
+  user_data = file("${path.module}/bootstrap.sh")
+  
   tags = {
     Name = "Acme-Web-Server"
   }
