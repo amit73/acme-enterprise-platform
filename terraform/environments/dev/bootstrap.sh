@@ -4,7 +4,7 @@ set -e
 
 apt update
 
-apt install -y nginx awscli
+apt install -y nginx
 
 cat <<EOF >/var/www/html/index.html
 <!DOCTYPE html>
